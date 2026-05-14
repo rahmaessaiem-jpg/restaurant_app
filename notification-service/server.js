@@ -20,7 +20,16 @@ async function startKafkaConsumer() {
   try {
     await consumer.connect();
 
-    await consumer.subscribe({ topics: ['user-registered', 'reservation-confirmed', 'order-placed'], fromBeginning: false });
+    await consumer.subscribe({
+        topics: [
+            'user-registered',
+            'reservation-confirmed',
+            'order-placed',
+            'feedback-submitted',
+            'event-created',
+        ],
+        fromBeginning: false,
+        });
 
     await consumer.run({
       eachMessage: async ({ topic, message }) => {
@@ -36,6 +45,13 @@ async function startKafkaConsumer() {
 
         if (topic === 'order-placed') {
           console.log(`NOTIFICATION: Order ${data.orderId} placed successfully for user ${data.userId}. Total: $${data.total}`);
+        }
+        if (topic === 'feedback-submitted') {
+        console.log(`NOTIFICATION: New feedback received for order ${data.orderId}. Rating: ${data.rating}/5`);
+        }
+
+        if (topic === 'event-created') {
+        console.log(`NOTIFICATION: New event created — ${data.title} on ${data.date} at ${data.time}`);
         }
       },
     });
