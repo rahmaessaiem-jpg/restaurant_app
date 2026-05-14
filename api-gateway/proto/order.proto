@@ -1,0 +1,63 @@
+syntax = "proto3";
+
+package order;
+
+service OrderService {
+  rpc GetMenu (GetMenuRequest) returns (GetMenuResponse);
+  rpc PlaceOrder (PlaceOrderRequest) returns (PlaceOrderResponse);
+  rpc GetOrder  (GetOrderRequest) returns (GetOrderResponse);
+  rpc ListOrders (ListOrdersRequest) returns (ListOrdersResponse);
+}
+
+message MenuItem {
+  string itemId = 1;
+  string name = 2;
+  string description = 3;
+  double price = 4;
+  string category = 5;
+}
+
+message GetMenuRequest {}
+
+message GetMenuResponse {
+  repeated MenuItem items = 1;
+}
+
+message OrderItem {
+  string itemId   = 1;
+  int32  quantity = 2;
+}
+
+message PlaceOrderRequest {
+  string userId = 1;
+  string reservationId = 2;
+  repeated OrderItem items= 3;
+}
+
+message PlaceOrderResponse {
+  bool   success = 1;
+  string message = 2;
+  string orderId = 3;
+  double total   = 4;
+}
+
+message GetOrderRequest {
+  string orderId = 1;
+}
+
+message GetOrderResponse {
+  string orderId = 1;
+  string userId = 2;
+  string reservationId = 3;
+  repeated OrderItem items= 4;
+  double total = 5;
+  string status= 6;
+}
+
+message ListOrdersRequest {
+  string userId = 1;
+}
+
+message ListOrdersResponse {
+  repeated GetOrderResponse orders = 1;
+}
