@@ -1,0 +1,38 @@
+syntax = "proto3";
+
+package feedback;
+
+service FeedbackService {
+  rpc SubmitFeedback (SubmitFeedbackRequest) returns (SubmitFeedbackResponse);
+  rpc GetFeedbacks (GetFeedbacksRequest)   returns (GetFeedbacksResponse);
+}
+
+message SubmitFeedbackRequest {
+  string userId  = 1;
+  string orderId = 2;
+  int32  rating  = 3;
+  string comment = 4;
+}
+
+message SubmitFeedbackResponse {
+  bool success = 1;
+  string message = 2;
+  string feedbackId = 3;
+}
+
+message Feedback {
+  string feedbackId = 1;
+  string userId = 2;
+  string orderId = 3;
+  int32  rating = 4;
+  string comment = 5;
+  string createdAt = 6;
+}
+
+message GetFeedbacksRequest {
+  string orderId = 1;
+}
+
+message GetFeedbacksResponse {
+  repeated Feedback feedbacks = 1;
+}
