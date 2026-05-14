@@ -1,0 +1,103 @@
+type User {
+  userId: ID!
+  name: String!
+  email: String!
+}
+
+type Reservation {
+  reservationId: ID!
+  userId: String!
+  type: String!
+  date: String!
+  time: String!
+  guests: Int!
+  status: String!
+  notes: String
+}
+
+type OrderItem {
+  itemId: String!
+  quantity: Int!
+}
+
+type Order {
+  orderId: ID!
+  userId: String!
+  reservationId: String
+  items: [OrderItem!]!
+  total: Float!
+  status: String!
+}
+
+type MenuItem {
+  itemId: ID!
+  name: String!
+  description: String!
+  price: Float!
+  category: String!
+}
+
+type Feedback {
+  feedbackId: ID!
+  userId: String!
+  orderId: String!
+  rating: Int!
+  comment: String
+  createdAt: String!
+}
+
+type Event {
+  eventId: ID!
+  title: String!
+  description: String
+  date: String!
+  time: String!
+  type: String!
+  capacity: Int!
+}
+
+type AuthPayload {
+  success: Boolean!
+  token: String
+  message: String!
+}
+
+type BasicResponse {
+  success: Boolean!
+  message: String!
+}
+
+type Query {
+  getUser(userId: ID!): User
+
+  getReservation(reservationId: ID!): Reservation
+  listReservations(userId: ID!): [Reservation!]!
+
+  getMenu: [MenuItem!]!
+  getOrder(orderId: ID!): Order
+  listOrders(userId: ID!): [Order!]!
+
+  getFeedbacks(orderId: ID!): [Feedback!]!
+
+  listEvents: [Event!]!
+  getEvent(eventId: ID!): Event
+}
+
+type Mutation {
+  register(name: String!, email: String!, password: String!): BasicResponse!
+  login(email: String!, password: String!): AuthPayload!
+
+  createReservation(userId: ID!, type: String!, date: String!, time: String!, guests: Int!, notes: String): BasicResponse!
+  cancelReservation(reservationId: ID!): BasicResponse!
+
+  placeOrder(userId: ID!, reservationId: String, items: [OrderItemInput!]!): BasicResponse!
+
+  submitFeedback(userId: ID!, orderId: ID!, rating: Int!, comment: String): BasicResponse!
+
+  createEvent(title: String!, description: String, date: String!, time: String!, type: String!, capacity: Int!): BasicResponse!
+}
+
+input OrderItemInput {
+  itemId: String!
+  quantity: Int!
+}

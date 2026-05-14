@@ -1,0 +1,48 @@
+syntax = "proto3";
+
+package event;
+
+service EventService {
+  rpc CreateEvent (CreateEventRequest) returns (CreateEventResponse);
+  rpc ListEvents (ListEventsRequest)  returns (ListEventsResponse);
+  rpc GetEvent (GetEventRequest) returns (GetEventResponse);
+}
+
+message CreateEventRequest {
+  string title  = 1;
+  string description = 2;
+  string date = 3;
+  string time = 4;
+  string type = 5;
+  int32  capacity = 6;
+}
+
+message CreateEventResponse {
+  bool   success = 1;
+  string message = 2;
+  string eventId = 3;
+}
+
+message Event {
+  string eventId= 1;
+  string title = 2;
+  string description = 3;
+  string date = 4;
+  string time = 5;
+  string type = 6;
+  int32  capacity = 7;
+}
+
+message ListEventsRequest {}
+
+message ListEventsResponse {
+  repeated Event events = 1;
+}
+
+message GetEventRequest {
+  string eventId = 1;
+}
+
+message GetEventResponse {
+  Event event = 1;
+}
