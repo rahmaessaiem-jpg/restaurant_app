@@ -1,19 +1,23 @@
 'use strict';
 
 const initSqlJs = require('sql.js');
-const fs = require('fs');
-const path = require('path');
+const fs        = require('fs');
+const path      = require('path');
 
 const DB_PATH = path.join(__dirname, 'reservations.db');
 let db;
 
 async function initDb() {
   const SQL = await initSqlJs();
+  db = new SQL.Database();
 
   if (fs.existsSync(DB_PATH)) {
-    db = new SQL.Database(fs.readFileSync(DB_PATH));
-  } else {
-    db = new SQL.Database();
+    try {
+      db = new SQL.Database(fs.readFileSync(DB_PATH));
+    } catch(e) {
+      console.warn('Could not load existing DB, starting fresh');
+      db = new SQL.Database();
+    }
   }
 
   db.run(`
@@ -48,19 +52,26 @@ function createReservation({ id, userId, type, date, time, guests, notes, create
 }
 
 function findReservationById(id) {
-  const stmt   = db.prepare('SELECT * FROM reservations WHERE id = ?');
-  const result = stmt.getAsObject([id]);
-  stmt.free();
-  return Object.keys(result).length === 0 ? null : result;
+  const results = db.exec('SELECT * FROM reservations WHERE id = "' + id + '"');
+  if (!results || results.length === 0 || results[0].values.length === 0) return null;
+
+  const cols = results[0].columns;
+  const vals = results[0].values[0];
+  const row  = {};
+  cols.forEach((col, i) => row[col] = vals[i]);
+  return row;
 }
 
 function findReservationsByUser(userId) {
-  const stmt    = db.prepare('SELECT * FROM reservations WHERE userId = ?');
-  const results = [];
-  stmt.bind([userId]);
-  while (stmt.step()) results.push(stmt.getAsObject());
-  stmt.free();
-  return results;
+  const results = db.exec('SELECT * FROM reservations WHERE userId = "' + userId + '"');
+  if (!results || results.length === 0) return [];
+
+  const cols = results[0].columns;
+  return results[0].values.map(vals => {
+    const row = {};
+    cols.forEach((col, i) => row[col] = vals[i]);
+    return row;
+  });
 }
 
 function cancelReservation(id) {
