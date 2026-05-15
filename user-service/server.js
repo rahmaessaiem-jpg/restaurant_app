@@ -99,7 +99,7 @@ async function main() {
 
   server.bindAsync('0.0.0.0:50051', grpc.ServerCredentials.createInsecure(), (err, port) => {
     if (err) { console.error('❌ Error:', err); return; }
-    console.log(`🚀 User Service running on port ${port}`);
+    console.log(` User Service running on port ${port}`);
   });
 }
 

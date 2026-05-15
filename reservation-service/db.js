@@ -23,7 +23,7 @@ async function initDb() {
   db.run(`
     CREATE TABLE IF NOT EXISTS reservations (
       id TEXT PRIMARY KEY,
-      userId TEXT NOT NULL,
+      userId  TEXT NOT NULL,
       type TEXT NOT NULL,
       date TEXT NOT NULL,
       time TEXT NOT NULL,
@@ -52,7 +52,8 @@ function createReservation({ id, userId, type, date, time, guests, notes, create
 }
 
 function findReservationById(id) {
-  const results = db.exec('SELECT * FROM reservations WHERE id = "' + id + '"');
+  const cleanId = id.trim();
+  const results = db.exec("SELECT * FROM reservations WHERE id = '" + cleanId + "'");
   if (!results || results.length === 0 || results[0].values.length === 0) return null;
 
   const cols = results[0].columns;
@@ -61,9 +62,9 @@ function findReservationById(id) {
   cols.forEach((col, i) => row[col] = vals[i]);
   return row;
 }
-
 function findReservationsByUser(userId) {
-  const results = db.exec('SELECT * FROM reservations WHERE userId = "' + userId + '"');
+  const cleanId = userId.trim();
+  const results = db.exec("SELECT * FROM reservations WHERE userId = '" + cleanId + "'");
   if (!results || results.length === 0) return [];
 
   const cols = results[0].columns;

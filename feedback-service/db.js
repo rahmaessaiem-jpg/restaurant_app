@@ -9,11 +9,15 @@ let db;
 
 async function initDb() {
   const SQL = await initSqlJs();
+  db = new SQL.Database();
 
   if (fs.existsSync(DB_PATH)) {
-    db = new SQL.Database(fs.readFileSync(DB_PATH));
-  } else {
-    db = new SQL.Database();
+    try {
+      db = new SQL.Database(fs.readFileSync(DB_PATH));
+    } catch(e) {
+      console.warn('Could not load existing DB, starting fresh');
+      db = new SQL.Database();
+    }
   }
 
   db.run(`
@@ -44,12 +48,15 @@ function createFeedback({ id, userId, orderId, rating, comment, createdAt }) {
 }
 
 function findFeedbacksByOrder(orderId) {
-  const stmt= db.prepare('SELECT * FROM feedbacks WHERE orderId = ?');
-  const results = [];
-  stmt.bind([orderId]);
-  while (stmt.step()) results.push(stmt.getAsObject());
-  stmt.free();
-  return results;
+  const results = db.exec('SELECT * FROM feedbacks WHERE orderId = "' + orderId + '"');
+  if (!results || results.length === 0) return [];
+
+  const cols = results[0].columns;
+  return results[0].values.map(vals => {
+    const row = {};
+    cols.forEach((col, i) => row[col] = vals[i]);
+    return row;
+  });
 }
 
 module.exports = { initDb, createFeedback, findFeedbacksByOrder };

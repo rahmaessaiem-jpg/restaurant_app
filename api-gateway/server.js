@@ -79,9 +79,12 @@ app.post('/api/reservations', async (req, res) => {
 
 app.get('/api/reservations/:reservationId', async (req, res) => {
   try {
+    console.log('Gateway calling GetReservation with:', req.params.reservationId);
     const result = await grpcCall(reservationClient, 'GetReservation', { reservationId: req.params.reservationId });
+    console.log('Gateway got result:', JSON.stringify(result));
     res.json(result);
   } catch (err) {
+    console.log('Gateway error:', err.message);
     res.status(500).json({ error: err.message });
   }
 });

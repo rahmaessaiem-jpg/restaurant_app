@@ -76,19 +76,22 @@ async function CreateReservation(call, callback) {
 
 function GetReservation(call, callback) {
   const { reservationId } = call.request;
+  console.log('Looking for reservation:', reservationId);
+  
   const r = findReservationById(reservationId);
+  console.log('Found:', r);
 
   if (!r) {
-    return callback(null, {
-      reservationId: '', userId: '', type: '',
-      date: '', time: '', guests: 0, status: '', notes: '',
+    return callback({
+      code: grpc.status.NOT_FOUND,
+      message: 'Reservation not found',
     });
   }
 
   callback(null, {
     reservationId: r.id,
     userId: r.userId,
-    type: r.type,
+    type:  r.type,
     date: r.date,
     time: r.time,
     guests: r.guests,
@@ -117,7 +120,10 @@ function ListReservations(call, callback) {
 
 function CancelReservation(call, callback) {
   const { reservationId } = call.request;
+  console.log('CancelReservation called with:', reservationId);
+  
   const r = findReservationById(reservationId);
+  console.log('Found reservation:', r);
 
   if (!r) {
     return callback(null, { success: false, message: 'Reservation not found' });
