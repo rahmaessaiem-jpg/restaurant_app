@@ -47,8 +47,12 @@ function createUser({ id, name, email, password, createdAt }) {
 }
 
 function findUserByEmail(email) {
-  // exec returns array of results — safest way in sql.js
-  const results = db.exec('SELECT * FROM users WHERE email = "' + email + '"');
+  const allUsers = db.exec('SELECT email FROM users');
+  console.log('All users in DB:', JSON.stringify(allUsers));
+  
+  const results = db.exec("SELECT * FROM users WHERE email = '" + email.trim() + "'");
+  console.log('Search result:', JSON.stringify(results));
+  
   if (!results || results.length === 0 || results[0].values.length === 0) return null;
 
   const cols = results[0].columns;

@@ -4,26 +4,30 @@ const grpc = require('@grpc/grpc-js');
 const protoLoader = require('@grpc/proto-loader');
 const path = require('path');
 
+
 function loadClient(protoFile, packageName, serviceName, address) {
   const def = protoLoader.loadSync(path.join(__dirname, 'proto', protoFile), {
     keepCase: false,
-    longs: String,
-    enums: String,
+    longs:    String,
+    enums:    String,
     defaults: true,
-    oneofs: true,
+    oneofs:   true,
   });
-
-  const pkg = grpc.loadPackageDefinition(def)[packageName];
-
+  const pkg    = grpc.loadPackageDefinition(def)[packageName];
   return new pkg[serviceName](address, grpc.credentials.createInsecure());
 }
+const USER_SERVICE = process.env.USER_SERVICE        || 'localhost:50051';
+const RESERVATION_SERVICE = process.env.RESERVATION_SERVICE || 'localhost:50052';
+const ORDER_SERVICE  = process.env.ORDER_SERVICE       || 'localhost:50053';
+const FEEDBACK_SERVICE = process.env.FEEDBACK_SERVICE    || 'localhost:50055';
+const EVENT_SERVICE  = process.env.EVENT_SERVICE       || 'localhost:50056';
 
-const userClient = loadClient('user.proto', 'user', 'UserService', 'localhost:50051');
-const reservationClient = loadClient('reservation.proto', 'reservation', 'ReservationService', 'localhost:50052');
-const orderClient = loadClient('order.proto', 'order', 'OrderService', 'localhost:50053');
+const userClient  = loadClient('user.proto',         'user',         'UserService',         USER_SERVICE);
+const reservationClient = loadClient('reservation.proto',  'reservation',  'ReservationService',  RESERVATION_SERVICE);
+const orderClient  = loadClient('order.proto',        'order',        'OrderService',        ORDER_SERVICE);
 const notificationClient = loadClient('notification.proto', 'notification', 'NotificationService', 'localhost:50054');
-const feedbackClient = loadClient('feedback.proto', 'feedback', 'FeedbackService', 'localhost:50055');
-const eventClient = loadClient('event.proto', 'event', 'EventService', 'localhost:50056');
+const feedbackClient = loadClient('feedback.proto',     'feedback',     'FeedbackService',     FEEDBACK_SERVICE);
+const eventClient = loadClient('event.proto',        'event',        'EventService',        EVENT_SERVICE);
 
 function grpcCall(client, method, request) {
   return new Promise((resolve, reject) => {

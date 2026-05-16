@@ -26,12 +26,17 @@ function loadClient(protoFile, packageName, serviceName, address) {
   return new pkg[serviceName](address, grpc.credentials.createInsecure());
 }
 
-const userClient = loadClient('user.proto', 'user', 'UserService', 'localhost:50051');
-const reservationClient = loadClient('reservation.proto', 'reservation', 'ReservationService', 'localhost:50052');
-const orderClient = loadClient('order.proto', 'order', 'OrderService', 'localhost:50053');
-const feedbackClient = loadClient('feedback.proto', 'feedback', 'FeedbackService', 'localhost:50055');
-const eventClient = loadClient('event.proto', 'event', 'EventService', 'localhost:50056');
+const USER_SERVICE = process.env.USER_SERVICE || 'localhost:50051';
+const RESERVATION_SERVICE = process.env.RESERVATION_SERVICE || 'localhost:50052';
+const ORDER_SERVICE = process.env.ORDER_SERVICE  || 'localhost:50053';
+const FEEDBACK_SERVICE = process.env.FEEDBACK_SERVICE || 'localhost:50055';
+const EVENT_SERVICE = process.env.EVENT_SERVICE || 'localhost:50056';
 
+const userClient = loadClient('user.proto',        'user',        'UserService',USER_SERVICE);
+const reservationClient = loadClient('reservation.proto', 'reservation', 'ReservationService', RESERVATION_SERVICE);
+const orderClient = loadClient('order.proto',       'order',       'OrderService', ORDER_SERVICE);
+const feedbackClient = loadClient('feedback.proto',    'feedback',    'FeedbackService',FEEDBACK_SERVICE);
+const eventClient  = loadClient('event.proto',       'event',       'EventService', EVENT_SERVICE);
 function grpcCall(client, method, request) {
   return new Promise((resolve, reject) => {
     client[method](request, (err, response) => {
@@ -43,7 +48,11 @@ function grpcCall(client, method, request) {
 
 app.post('/api/register', async (req, res) => {
   try {
-    const result = await grpcCall(userClient, 'Register', req.body);
+    const result = await grpcCall(userClient, 'Register', {
+      name: req.body.name,
+      email: req.body.email,
+      password: req.body.password
+    });
     res.json(result);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -52,13 +61,16 @@ app.post('/api/register', async (req, res) => {
 
 app.post('/api/login', async (req, res) => {
   try {
-    const result = await grpcCall(userClient, 'Login', req.body);
+    console.log('Login request body:', req.body);
+    const result = await grpcCall(userClient, 'Login', {
+      email: req.body.email,
+      password: req.body.password
+    });
     res.json(result);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
-
 app.get('/api/users/:userId', async (req, res) => {
   try {
     const result = await grpcCall(userClient, 'GetUser', { userId: req.params.userId });
