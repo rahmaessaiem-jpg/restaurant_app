@@ -121,6 +121,10 @@ const resolvers = {
       const res = await grpcCall(eventClient, 'CreateEvent', args);
       return { success: res.success, message: res.message };
     },
+    updateOrderStatus: async (_, { orderId, status }) => {
+      const res = await grpcCall(orderClient, 'UpdateOrderStatus', { orderId, status });
+      return { success: res.success, message: res.message };
+    },
   },
 };
 

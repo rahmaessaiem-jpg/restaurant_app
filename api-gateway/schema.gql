@@ -95,6 +95,7 @@ type Mutation {
   submitFeedback(userId: ID!, orderId: ID!, rating: Int!, comment: String): BasicResponse!
 
   createEvent(title: String!, description: String, date: String!, time: String!, type: String!, capacity: Int!): BasicResponse!
+  updateOrderStatus(orderId: ID!, status: String!): BasicResponse!
 }
 
 input OrderItemInput {

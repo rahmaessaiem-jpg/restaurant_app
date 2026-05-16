@@ -6,7 +6,7 @@ const protoLoader    = require('@grpc/proto-loader');
 const { randomUUID } = require('crypto');
 const { Kafka }      = require('kafkajs');
 
-const { initDb, getMenuItems, getMenuItemById, createOrder, findOrderById, findOrdersByUser } = require('./db');
+const { initDb, getMenuItems, getMenuItemById, createOrder, findOrderById, findOrdersByUser , updateOrderStatus } = require('./db');
 const PROTO_PATH = path.join(__dirname, 'proto', 'order.proto');
 const packageDef = protoLoader.loadSync(PROTO_PATH, {
   keepCase: false,
@@ -123,6 +123,22 @@ async function ListOrders(call, callback) {
 
   callback(null, { orders });
 }
+async function UpdateOrderStatus(call, callback) {
+  const { orderId, status } = call.request;
+
+  const validStatuses = ['pending', 'preparing', 'ready', 'delivered'];
+  if (!validStatuses.includes(status)) {
+    return callback(null, { success: false, message: 'Invalid status' });
+  }
+
+  const order = await findOrderById(orderId);
+  if (!order) {
+    return callback(null, { success: false, message: 'Order not found' });
+  }
+
+  await updateOrderStatus(orderId, status);
+  callback(null, { success: true, message: `Order status updated to ${status}` });
+}
 async function main() {
   await initDb();
   await connectKafka();
@@ -133,6 +149,7 @@ async function main() {
     PlaceOrder,
     GetOrder,
     ListOrders,
+    UpdateOrderStatus,
   });
 
   server.bindAsync(
