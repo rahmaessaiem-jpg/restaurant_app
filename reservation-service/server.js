@@ -16,7 +16,10 @@ const packageDef = protoLoader.loadSync(PROTO_PATH, {
   oneofs:   true,
 });
 const reservationProto = grpc.loadPackageDefinition(packageDef).reservation;
-const kafka    = new Kafka({ clientId: 'reservation-service', brokers: ['localhost:9092'] });
+const kafka = new Kafka({ 
+  clientId: '...', 
+  brokers: [process.env.KAFKA_BROKER || 'localhost:9092'] 
+});
 const producer = kafka.producer();
 
 async function connectKafka() {

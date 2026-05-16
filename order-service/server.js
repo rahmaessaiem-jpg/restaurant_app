@@ -16,7 +16,10 @@ const packageDef = protoLoader.loadSync(PROTO_PATH, {
   oneofs:   true,
 });
 const orderProto = grpc.loadPackageDefinition(packageDef).order;
-const kafka    = new Kafka({ clientId: 'order-service', brokers: ['localhost:9092'] });
+const kafka = new Kafka({ 
+  clientId: '...', 
+  brokers: [process.env.KAFKA_BROKER || 'localhost:9092'] 
+});
 const producer = kafka.producer();
 
 async function connectKafka() {

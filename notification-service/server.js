@@ -13,7 +13,10 @@ const packageDef = protoLoader.loadSync(PROTO_PATH, {
   oneofs:   true,
 });
 const notificationProto = grpc.loadPackageDefinition(packageDef).notification;
-const kafka    = new Kafka({ clientId: 'notification-service', brokers: ['localhost:9092'] });
+const kafka = new Kafka({ 
+  clientId: '...', 
+  brokers: [process.env.KAFKA_BROKER || 'localhost:9092'] 
+});
 const consumer = kafka.consumer({ groupId: 'notification-group' });
 
 async function startKafkaConsumer() {

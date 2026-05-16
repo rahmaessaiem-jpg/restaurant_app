@@ -22,7 +22,10 @@ const userProto = grpc.loadPackageDefinition(packageDef).user;
 
 const JWT_SECRET = 'restaurant_secret_2025';
 
-const kafka = new Kafka({ clientId: 'user-service', brokers: ['localhost:9092'] });
+const kafka = new Kafka({ 
+  clientId: '...', 
+  brokers: [process.env.KAFKA_BROKER || 'localhost:9092'] 
+});
 const producer = kafka.producer();
 
 async function connectKafka() {
@@ -69,14 +72,23 @@ async function Register(call, callback) {
 
 async function Login(call, callback) {
   const { email, password } = call.request;
-
+  console.log('Login attempt for:', email);
+  
   const user = findUserByEmail(email);
-  if (!user) return callback(null, { success: false, token: '', message: 'User not found' });
+  console.log('User found:', user);
+
+  if (!user) {
+    return callback(null, { success: false, token: '', message: 'User not found' });
+  }
 
   const valid = await bcrypt.compare(password, user.password);
   if (!valid) return callback(null, { success: false, token: '', message: 'Wrong password' });
 
-  const token = jwt.sign({ userId: user.id, email: user.email }, JWT_SECRET, { expiresIn: '24h' });
+  const token = jwt.sign(
+    { userId: user.id, email: user.email },
+    JWT_SECRET,
+    { expiresIn: '24h' }
+  );
 
   callback(null, { success: true, token, message: 'Login successful' });
 }
