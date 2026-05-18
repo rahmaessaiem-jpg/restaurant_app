@@ -7,6 +7,7 @@ service OrderService {
   rpc PlaceOrder (PlaceOrderRequest) returns (PlaceOrderResponse);
   rpc GetOrder  (GetOrderRequest) returns (GetOrderResponse);
   rpc ListOrders (ListOrdersRequest) returns (ListOrdersResponse);
+  rpc UpdateOrderStatus (UpdateOrderStatusRequest) returns (UpdateOrderStatusResponse);
 }
 
 message MenuItem {
@@ -60,4 +61,13 @@ message ListOrdersRequest {
 
 message ListOrdersResponse {
   repeated GetOrderResponse orders = 1;
+}
+message UpdateOrderStatusRequest {
+  string orderId = 1;
+  string status  = 2;
+}
+
+message UpdateOrderStatusResponse {
+  bool   success = 1;
+  string message = 2;
 }

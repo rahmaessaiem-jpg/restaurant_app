@@ -200,6 +200,18 @@ app.get('/api/events/:eventId', async (req, res) => {
   }
 });
 
+app.put('/api/orders/:orderId/status', async (req, res) => {
+  try {
+    const result = await grpcCall(orderClient, 'UpdateOrderStatus', {
+      orderId: req.params.orderId,
+      status:  req.body.status,
+    });
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 async function startServer() {
   const typeDefs = fs.readFileSync(path.join(__dirname, 'schema.gql'), 'utf8');
   const apolloServer = new ApolloServer({ typeDefs, resolvers });

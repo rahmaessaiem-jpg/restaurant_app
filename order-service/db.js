@@ -97,5 +97,10 @@ async function findOrdersByUser(userId) {
   const docs = await ordersCollection.find({ selector: { userId } }).exec();
   return docs.map(d => d.toJSON());
 }
-
-module.exports = { initDb, getMenuItems, getMenuItemById, createOrder, findOrderById, findOrdersByUser };
+async function updateOrderStatus(id, status) {
+  const doc = await ordersCollection.findOne(id).exec();
+  if (doc) {
+    await doc.patch({ status });
+  }
+}
+module.exports = { initDb, getMenuItems, getMenuItemById, createOrder, findOrderById, findOrdersByUser , updateOrderStatus};
